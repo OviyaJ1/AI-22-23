@@ -1,6 +1,7 @@
 #Oviya Jeyaprakash 08/24/2022
 #Python Exercises 1
 #010
+
 import sys
 
 if(sys.argv[1] == "A"):
@@ -53,19 +54,12 @@ elif(sys.argv[1] == "F"):
 
 elif(sys.argv[1] == "G"):
     l = [0, 0, 0, 0, 0] #order a,e,i,o,u
-    for index, s in enumerate(sys.argv[2]):
-        if(s == "a" or s == "A"):
-            l[0] += 1
-        elif(s == "e" or s == "E"):
-            l[1] += 1
-        elif(s == "i" or s == "I"):
-            l[2] += 1
-        elif(s == "o" or s == "O"):
-            l[3] += 1
-        elif(s == "u" or s == "U"):
-            l[4] += 1
-    print("A:" + str(l[0]) + " E:" + str(l[1]) + " I:" + str(l[2]) + " O:" + str(l[3]) + " U:" + str(l[4]))
+    word = sys.argv[2].lower()
 
-    
-    
-    
+    vowels = {"a":0, "e":0, "i":0, "o":0, "u":0}
+
+    for index, s in enumerate(str(word)):
+        if s in vowels:
+            vowels[s] += 1
+
+    print(vowels)
