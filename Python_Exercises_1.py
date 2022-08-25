@@ -1,5 +1,6 @@
 #Oviya Jeyaprakash 08/24/2022
 #Python Exercises 1
+#010
 import sys
 
 if(sys.argv[1] == "A"):
