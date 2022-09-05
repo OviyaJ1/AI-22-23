@@ -3,11 +3,11 @@
 #020
 
 import sys
-from collections import deque
+from heapq import heappush, heappop, heapify
 from time import perf_counter
 start = perf_counter()
 
-f1, f2, f3 = "10kfile1.txt", "10kfile2.txt", "10kfile3.txt"
+f1, f2, f3 = "1mfile1.txt", "1mfile2.txt", "1mfile3.txt"
 l1, l2, l3 = [], [], []
 
 with open(f1) as f:
@@ -30,7 +30,6 @@ for i in s1:
     if i in s2:
         count += 1
 print(count)
-print("\n")
 
 #2
 dict1 = {}
@@ -44,24 +43,6 @@ for i in l1:
         if count % 100 == 0:
             sum += i
 print(sum)
-
-# l4 = list(s1)
-# sum = count = k =  0
-# for i in range(int(len(l1)/100) - 1):
-#     if l1[((i + 1) * 100)] in s1:
-#         sum += l1[((i + 1) * 100)]
-#     else:
-#         k = 0
-#         while not (l1[((i + 1) * 100) + k] in s1):
-#             k += 1
-#         sum += l1[((i + 1) * 100) + k]
-#     sum += l1[((i + 1) * 100)]
-#     print(l1[((i + 1) * 100)])
-#     count += 1
-# print(sum)
-# print(count)
-# print("\n") 
-
 
 #3 #use a dictionary
 dict2 = {}
@@ -82,21 +63,10 @@ print(count)
 
 #4
 s4 = set(l1)
-#sortS1 = sorted(s1)
-#print(sortS1)
-#print(s1)
 result = []
 for k in range(10):
     result.append(s4.pop())
 print(result)
-
-# count = 0
-# for key in dict1:
-#     result.append(key) 
-#     count += 1
-#     if count >= 10:
-#         break
-# print(result)
 
 #5
 result = []
@@ -125,16 +95,19 @@ print(result)
 
 #6
 sum = 0
+heap_list = []
 printL = []
 #print(s1)
 for i in l1:
-    
+    heappush(heap_list, i)
     if i % 53 == 0:
-        k = s1.pop()
+        k = heappop(heap_list)
+        while k in printL:
+            k = heappop(heap_list)
         sum += k
         printL.append(k)
 print(sum)
-print(printL)
+#print(printL)
 
 end = perf_counter()
 print("Total time:", end - start)
