@@ -5,7 +5,7 @@
 import sys
 from collections import deque
 from time import perf_counter
-start = perf_counter()
+total_start = perf_counter()
 #file = sys.argv[1]
 file = "slide_puzzle_tests.txt"
 
@@ -55,91 +55,68 @@ def get_children(board):
 
     return result
 
+def reverse(temp_dict, goal, state):
+    word = goal
+    solution_path = [goal]
+    while word != state:
+        solution_path.append(temp_dict[word])
+        word = temp_dict[word]
+    return solution_path
+
 def BFS(board):
     fringe = deque()
     visited = set()
+    temp_dict = {}
+
     fringe.append((board, 0))
     visited.add(board)
+    goal = find_goal(board)
     while fringe:
         v = fringe.popleft()
-        if v[0] == find_goal(board):
-            print("Moves: %s" % v[1])
-            return v
+        if v[0] == goal:
+            #print("Moves: %s" % v[1])
+            solution_path = reverse(temp_dict, goal, board)
+            return v #, solution_path
         for child in get_children(v[0]):
             if child not in visited:
+                temp_dict[child] = v[0]
                 fringe.append((child, v[1] + 1))
                 visited.add(child)
-    print("done")
-
-def BFS_brainteaser(board):
-    board = find_goal(board)
-    fringe = deque()
-    visited = set()
-    fringe.append((board, 0))
-    #visited.add(board)
-
-    brain3 = 0 #count
-    #brain4 = 0 #max
-    brain4_2 = 0 #count
-    brain4_3 = []
-
-    while fringe:
-        v = fringe.popleft()
-        for child in get_children(v[0]):
-            if child not in visited:
-                fringe.append((child, v[1] + 1))
-
-                if(v[1] + 1 == 10):
-                    brain3 += 1
-                
-                # if(v[1] + 1 > brain3):
-                #     brain4 = v[1] + 1
-
-                if(v[1] + 1 == 31):
-                    brain4_2 += 1
-                    brain4_3.append(child)
-
-                visited.add(child)
-    print(brain3)
-    print(brain4_2)
-    print(brain4_3)
-    return visited
-    print("done")
-
-def BFS_brainteaser_helper(board):
-    fringe = deque()
-    visited = set()
-    fringe.append((board, 0))
-    visited.add(board)
-    while fringe:
-        v = fringe.popleft()
-        if v[0] == find_goal(board):
-            return v[1] #returns moves
-        for child in get_children(v[0]):
-            if child not in visited:
-                fringe.append((child, v[1] + 1))
-                visited.add(child)
-    print("Not Solvable")
-
-
-BFS("21345678.")
+    print("Unsolvable")
 
 
 #brainteasers
 #1: 2x2 - 12, 3x3 - 181440
 #2: 21345678. (code goes through the entire fringe)
 #3: 286
-#4: 31, ['8672543.1', '64785.321']
+#4: 8672543.1 - 
+#   ['12345678.', '1234567.8', '123456.78', '123.56478', '.23156478', 
+#   '2.3156478', '23.156478', '23615.478', '23615847.', '2361584.7', 
+#   '236158.47', '236.58147', '2365.8147', '2.6538147', '26.538147', 
+#   '26853.147', '26853714.', '2685371.4', '268537.14', '268.37514', 
+#   '2683.7514', '2.8367514', '28.367514', '28736.514', '28736451.', 
+#   '2873645.1', '287364.51', '287.64351', '.87264351', '8.7264351', 
+#   '8672.4351', '8672543.1']
+#   64785.321 - 
+#   ['12345678.', '1234567.8', '1234.6758', '123.46758', '.23146758', 
+#   '2.3146758', '23.146758', '23614.758', '2361.4758', '236.14758', 
+#   '.36214758', '3.6214758', '36.214758', '36421.758', '3642.1758', 
+#   '3642517.8', '364251.78', '364.51278', '.64351278', '6.4351278', 
+#   '6543.1278', '6543712.8', '65437128.', '65437.281', '6543.7281', 
+#   '6543872.1', '654387.21', '654.87321', '6548.7321', '6.4857321', 
+#   '64.857321', '64785.321']
+#   Length: 31
 #5: ABCFEJGD.MLHNIKO, 20 moves
 
-# count = 0
-# for x in line_list:
-#     size, board = x.split()
-#     v = BFS(board)
-#     end = perf_counter()
-#     board = board[0:] + ","
-#     print("Line ", count, ":", board, v[1], "moves found in", end - start)
-#     count += 1
+count = 0
+for x in line_list:
+    size, board = x.split()
+    start = perf_counter()
+    v = BFS(board)
+    end = perf_counter()
+    board = board[0:] + ","
+    print("Line %s" % count + ":", board, v[1], "moves found in", end - start)
+    count += 1
 
 # count = 0
 # for x in line_list:
@@ -152,5 +129,5 @@ BFS("21345678.")
 #     count += 1
 #     print("\n")
 
-end = perf_counter()
-print("Total time:", end - start)
+total_end = perf_counter()
+print("Total time:", total_end - total_start)
