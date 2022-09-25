@@ -14,7 +14,7 @@ word_pairs = []
 
 with open(dictionary) as f:
     line_list = ({line.strip() for line in f})
-    dict_count += 1
+    dict_count = len(line_list)
 
 with open(file_pairs) as f:
     word_pairs = ([line.strip() for line in f])
@@ -33,7 +33,7 @@ def create_dict(line_list):
         word_dict[word] = value_list 
     
     dict_end = perf_counter()
-    print("Time to create the data structure was:", dict_end - dict_start)
+    print("Time to create the data structure was:", dict_end - dict_start, "seconds")
     print("There are", dict_count, "words in this dict.")
     return word_dict
 
@@ -53,7 +53,6 @@ def reverse(temp_dict, goal, state):
     return solution_path
 
 def BFS(line):
-    word_dict = create_dict(line_list)
     state, goal = find_goal(line)
     temp_dict = {}
 
@@ -79,7 +78,10 @@ def BFS(line):
 #print(BFS("parked yonder"))
 
 count = 0
-for line in word_pairs:
+word_dict = create_dict(line_list)
+print("\n")
+
+for line in word_pairs:    
     puzzle_start = perf_counter()
     print("Line:", count)
     l = BFS(line)
