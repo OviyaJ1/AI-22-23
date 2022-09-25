@@ -5,14 +5,16 @@
 import sys
 from collections import deque
 from time import perf_counter
-total_start = perf_counter()
+dict_start = perf_counter()
 #file = sys.argv[1]
 dictionary, file_pairs = "words_06_letters.txt", "puzzles_normal.txt"
 line_list = set()
+dict_count = 0
 word_pairs = []
 
 with open(dictionary) as f:
     line_list = ({line.strip() for line in f})
+    dict_count += 1
 
 with open(file_pairs) as f:
     word_pairs = ([line.strip() for line in f])
@@ -29,6 +31,10 @@ def create_dict(line_list):
                     if child in line_list:
                         value_list.append(child)
         word_dict[word] = value_list 
+    
+    dict_end = perf_counter()
+    print("Time to create the data structure was:", dict_end - dict_start)
+    print("There are", dict_count, "words in this dict.")
     return word_dict
 
 def find_goal(line):
@@ -74,6 +80,7 @@ def BFS(line):
 
 count = 0
 for line in word_pairs:
+    puzzle_start = perf_counter()
     print("Line:", count)
     l = BFS(line)
 
@@ -84,7 +91,6 @@ for line in word_pairs:
     
     print("\n")
     count += 1
-   
+puzzle_end = perf_counter()
 
-total_end = perf_counter()
-print("Total time:", total_end - total_start)
+print("Time to solve all of these puzzles was:", puzzle_end - puzzle_start, "seconds")
