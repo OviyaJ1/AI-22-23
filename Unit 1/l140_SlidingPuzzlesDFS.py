@@ -8,11 +8,12 @@ from time import perf_counter
 total_start = perf_counter()
 #file = sys.argv[1]
 file = "011111111111111"
+#file = "010100000000000"
 
 # with open(file) as f:
 #     line_list = [line.strip() for line in f]
 
-def swap(size, board, index1, index2, index3): #original peg location, new location, removed peg
+def swap(board, index1, index2, index3): #original peg location, new location, removed peg
     newBoard = ""
     for i in range(len(board)):
         if i == index1 or i == index3:
@@ -24,16 +25,19 @@ def swap(size, board, index1, index2, index3): #original peg location, new locat
     #print_puzzle(size, newBoard)
     return newBoard
 
-def print_puzzle(size, board):
-    for i in range(size):
-        print((" ").join(board[(s := i * size):s + size]))
+def print_puzzle(board):
+    print("    " + (" ").join(board[0])) 
+    print("   " + (" ").join(board[1:3]))
+    print("  " + (" ").join(board[3:6]))
+    print(" " + (" ").join(board[6:10]))
+    print((" ").join(board[10:]))
 
 def find_goal(board):
     return "100000000000000"
 
 def where_index(board, row, column): 
     count = index = 0
-    while count != row:
+    while count != row - 1:
         count += 1
         index += count
     index += column
@@ -41,31 +45,16 @@ def where_index(board, row, column):
 
 def is_empty(board, row, column):
     count = index = 0
-    while count != row:
+    while count != row - 1:
         count += 1
         index += count
     index += column
-    if board[index] == "0":
+    #print(row, column, index)
+    if board[index - 1] == "0":
         return index
     return -1
 
 def get_children(board):
-    #check every peg
-        #check row and column
-            #num = index + 1, count = 1, row = column = 0
-            #while num > 0
-                #num -= count
-                #count += 1
-            #row = count
-            #column = row + num
-        #check
-            #if column - 2 > 0 and empty space (left)
-            #if column + 2 < row and empty space (right)
-            #if row + 2 < size and column and empty space (down left)
-            #if row + 2 < size and column + 2 and empty space (down right)
-            #if row - 2 > 0 and column - 2 > 0 and empty space (top left)
-            #if row - 2 > 0 and column < (row - 2) and empty space (top left)
-
     size = 5
     row = column = 0
     result = []
@@ -79,48 +68,29 @@ def get_children(board):
             while num > 0:
                 num -= count
                 count += 1
-            row = count
+            row = count - 1
             column = row + num
+            #print(index, row, column)
         
-        #check
-        if column - 2 > 0 and (index2 := is_empty(board, row, column - 1)) == -1 and (index1 := is_empty(board, row, column - 2)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
+            #check
+            if column - 2 > 0 and is_empty(board, row, column - 1) == -1 and (index1 := is_empty(board, row, column - 2)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row, column - 1) - 1))
 
-        if column + 2 < row and (index2 := is_empty(board, row, column + 1)) == -1 and (index1 := is_empty(board, row, column + 2)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
+            if column + 2 < row and is_empty(board, row, column + 1) == -1 and (index1 := is_empty(board, row, column + 2)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row, column + 1) - 1))
 
-        if row + 2 <= size and (index2 := is_empty(board, row + 1, column)) == -1 and (index1 := is_empty(board, row + 2, column)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
-        
-        if row + 2 <= size and (index2 := is_empty(board, row + 1, column + 1)) == -1 and (index1 := is_empty(board, row + 2, column + 2)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
-
-        if row - 2 > 0 and column - 2 > 0 and (index2 := is_empty(board, row - 1, column - 1)) == -1 and (index1 := is_empty(board, row - 2, column - 2)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
-        
-        if row - 2 > 0 and column < (row - 2) and (index2 := is_empty(board, row - 1, column)) == -1 and (index1 := is_empty(board, row - 2, column)) != -1:
-            result.append(swap(board, index, index1 - 1, index2 - 1))
+            if row + 2 <= size and is_empty(board, row + 1, column) == -1 and (index1 := is_empty(board, row + 2, column)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row + 1, column) - 1))
             
+            if row + 2 <= size and is_empty(board, row + 1, column + 1) == -1 and (index1 := is_empty(board, row + 2, column + 2)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row + 1, column + 1) - 1))
 
-
-    #check up, down, left, right; -size, +size, -1, +1
-    #queue and set
-    result = []
-
-    size = int(len(board) ** 0.5)
-    i1 = board.index(".")
-    if i1 - size >= 0:
-        result.append(swap(size, board, i1, i1 - size))
-
-    if i1 + size < len(board):
-        result.append(swap(size, board, i1, i1 + size))
-
-    if i1 % size != 0:
-        result.append(swap(size, board, i1, i1 - 1))
+            if row - 2 > 0 and column - 2 >= 0 and is_empty(board, row - 1, column - 1) == -1 and (index1 := is_empty(board, row - 2, column - 2)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row - 1, column - 1) - 1))
+            
+            if row - 2 > 0 and column <= (row - 2) and is_empty(board, row - 1, column) == -1 and (index1 := is_empty(board, row - 2, column)) != -1:
+                result.append(swap(board, index, index1 - 1, where_index(board, row - 1, column) - 1))
     
-    if (i1 + 1) % size != 0:
-        result.append(swap(size, board, i1, i1 + 1))
-
     return result
 
 def reverse(temp_dict, goal, state):
@@ -144,7 +114,7 @@ def BFS(board):
         if v[0] == goal:
             #print("Moves: %s" % v[1])
             solution_path = reverse(temp_dict, goal, board)
-            return v #, solution_path
+            return v, solution_path
         for child in get_children(v[0]):
             if child not in visited:
                 temp_dict[child] = v[0]
@@ -165,7 +135,7 @@ def DFS(board):
         if v[0] == goal:
             #print("Moves: %s" % v[1])
             solution_path = reverse(temp_dict, goal, board)
-            return v #, solution_path
+            return v, solution_path
         for child in get_children(v[0]):
             if child not in visited:
                 temp_dict[child] = v[0]
@@ -173,15 +143,36 @@ def DFS(board):
                 visited.add(child)
     print("Unsolvable")
 
-count = 0
-for x in line_list:
-    size, board = x.split()
-    start = perf_counter()
-    v = BFS(board)
-    end = perf_counter()
-    board = board[0:] + ","
-    print("Line %s" % count + ":", board, v[1], "moves found in", end - start)
+#print_puzzle("011111111111111")
+#print(BFS(file))
+
+print("BFS:" + "\n")
+bfs = BFS(file)
+count = 1
+for i in reversed(bfs[1]):
+    print("Move %s" % count + "\n")
     count += 1
+    print_puzzle(i)
+    print("\n")
+
+print("DFS:" + "\n")
+dfs = DFS(file)
+count = 1
+for i in reversed(dfs[1]):
+    print("Move %s" % count + "\n")
+    count += 1
+    print_puzzle(i)
+    print("\n")
+
+# count = 0
+# for x in line_list:
+#     size, board = x.split()
+#     start = perf_counter()
+#     v = BFS(board)
+#     end = perf_counter()
+#     board = board[0:] + ","
+#     print("Line %s" % count + ":", board, v[1], "moves found in", end - start)
+#     count += 1
 
 # count = 0
 # for x in line_list:
