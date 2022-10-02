@@ -6,8 +6,8 @@ import sys
 from collections import deque
 from time import perf_counter
 total_start = perf_counter()
-file = sys.argv[1]
-#file = "slide_puzzle_tests.txt"
+#file = sys.argv[1]
+file = "slide_puzzle_tests.txt"
 
 with open(file) as f:
     line_list = [line.strip() for line in f]
@@ -104,17 +104,8 @@ def BiBFS(board):
         v2 = fringe_end.popleft()
 
         if v1[0] in visited_end:
-            #print(v1, visited_end)
-            #print(temp_dict_end)
-            # print("Board:", board)
-            # print("Goal:", goal)
-            # print("Moves:", v1[1] + temp_dict_end[v1[0]])
             return goal, v1[1] + temp_dict_end[v1[0]]
         if v2[0] in visited_start:
-            #print(v2, visited_start)
-            # print("Board:", board)
-            # print("Goal:", goal)
-            # print("Moves:", v2[1] + temp_dict_start[v2[0]])
             return goal, v2[1] + temp_dict_start[v2[0]]
         for child in get_children(v1[0]):
             if child not in visited_start:
@@ -130,7 +121,16 @@ def BiBFS(board):
                 visited_end.add(child)
     print("Unsolvable")
 
-BFS("863.54217")
+#print(BiBFS("FCJDBIAGKLOHME.N"))
+
+#tasks:
+#2: FCJDBIAGKLOHME.N, 37 moves
+#3: BiBFS runs word ladders about two times faster than BFS
+#4: I stored the words in two different dictionaries (one for each side), the child of the word was 
+#   the key and the word itself was the value. I used the overlapping word that were in both dictionaries
+#   to create the word ladder in the end
+#5: As long as we know the start and end goal, BiBFS is more advantageous than BFS because checking 
+#   in both directions/sides saves a lot more time
 
 count = 0
 for x in line_list:
