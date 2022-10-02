@@ -1,11 +1,11 @@
 #Oviya Jeyaprakash 09/16/2022
-#Sliding Puzzles BFS
-#120
+#Sliding Puzzles DFS
+#140
 
 import sys
 from collections import deque
 from time import perf_counter
-total_start = perf_counter()
+#total_start = perf_counter()
 #file = sys.argv[1]
 file = "011111111111111"
 #file = "010100000000000"
@@ -85,7 +85,7 @@ def get_children(board):
             if row + 2 <= size and is_empty(board, row + 1, column + 1) == -1 and (index1 := is_empty(board, row + 2, column + 2)) != -1:
                 result.append(swap(board, index, index1 - 1, where_index(board, row + 1, column + 1) - 1))
 
-            if row - 2 > 0 and column - 2 >= 0 and is_empty(board, row - 1, column - 1) == -1 and (index1 := is_empty(board, row - 2, column - 2)) != -1:
+            if row - 2 > 0 and column - 2 > 0 and is_empty(board, row - 1, column - 1) == -1 and (index1 := is_empty(board, row - 2, column - 2)) != -1:
                 result.append(swap(board, index, index1 - 1, where_index(board, row - 1, column - 1) - 1))
             
             if row - 2 > 0 and column <= (row - 2) and is_empty(board, row - 1, column) == -1 and (index1 := is_empty(board, row - 2, column)) != -1:
@@ -127,7 +127,7 @@ def DFS(board):
     visited = set()
     temp_dict = {}
 
-    fringe.append((board, 0))
+    fringe.append((board, 0)) 
     visited.add(board)
     goal = find_goal(board)
     while fringe:
@@ -149,20 +149,34 @@ def DFS(board):
 print("BFS:" + "\n")
 bfs = BFS(file)
 count = 1
+bfs_start = perf_counter()
 for i in reversed(bfs[1]):
     print("Move %s" % count + "\n")
     count += 1
     print_puzzle(i)
     print("\n")
+bfs_end = perf_counter()
+print("BFS time:", bfs_end - bfs_start)
 
-print("DFS:" + "\n")
+dfs = BFS(file)
+print("\n" + "DFS:" + "\n")
 dfs = DFS(file)
 count = 1
+dfs_start = perf_counter()
 for i in reversed(dfs[1]):
     print("Move %s" % count + "\n")
     count += 1
     print_puzzle(i)
     print("\n")
+dfs_end = perf_counter()
+print("DFS time:", dfs_end - dfs_start)
+
+#So: Why?
+#1: Sliding Puzzles has many more possibilities to go through than Peg Solitaire when using dfs,
+#   there are so many paths to get to the end goal of sliding puzzles, while there are a lot fewer 
+#   moves to finish the peg solitaire
+#2: Maybe when finding the longest path because dfs already goes through the entire length of each path,
+#   while bfs would just take a step in each path 
 
 # count = 0
 # for x in line_list:
@@ -185,5 +199,5 @@ for i in reversed(dfs[1]):
 #     count += 1
 #     print("\n")
 
-total_end = perf_counter()
-print("Total time:", total_end - total_start)
+#total_end = perf_counter()
+#print("Total time:", total_end - total_start)
