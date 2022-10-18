@@ -9,79 +9,82 @@ from collections import deque
 from time import perf_counter
 total_start = perf_counter()
 
-file = sys.argv[1]
-#file = "slide_puzzle_tests_2.txt"
+#file = sys.argv[1]
+file = "slide_puzzle_tests_2.txt"
+
+# move up: top > back > bottom > front > top
+# move left: top > left > bottom > right > top
+# goal when cube is completely blue
 
 with open(file) as f:
     line_list = [line.strip() for line in f]
 
-def swap(board, index1, index2):
+def swap(board, index2, cube):
+
+    new_cube_index = index2
+    bottom = ""
+    s = -1
+    if cube[1] == 0:
+        bottom = "."
+    else:
+        bottom = "@"
+    old_value = board[index2]
+    if old_value == ".":
+        s = 0
+    else:
+        s = 1
+
     newBoard = ""
     for i in range(len(board)):
-        if i == index1:
-            newBoard += board[index2]
-        elif i == index2:
-            newBoard += board[index1]
+        if i == index2:
+            newBoard += bottom
         else:
             newBoard += board[i]
-    #print_puzzle(size, newBoard)
-    return newBoard
+    
+    new_cube = (cube[0], s, cube[2], cube[3], cube[4], cube[5])
+
+    return newBoard, new_cube_index, new_cube
 
 def print_puzzle(size, board):
     for i in range(size):
         print((" ").join(board[(s := i * size):s + size]))
 
-def find_goal(board):
-    sort_board = sorted(board)
-    goal_state = sort_board[1:]
-    goal_state.append(".")
-    return ''.join(goal_state)
+def find_goal(state):
+    size, board = state.split()
+    size = int(size)
 
-def get_children(board):
-    #check up, down, left, right; -size, +size, -1, +1
-    #queue and set
-    result = []
+def get_children(board, cube_index, cube):
+    #move up: top > back > bottom > front > top
+    #move down: top < back < bottom < front < top
+    #move left: top > left > bottom > right > top
+    #move right: top < left < bottom < right < top
+    #cube: top, bottom, left, right, front, back
 
     size = int(len(board) ** 0.5)
-    i1 = board.index(".")
-    if i1 - size >= 0:
-        result.append(swap(board, i1, i1 - size))
+    i1 = cube_index
+    result = []
 
-    if i1 + size < len(board):
-        result.append(swap(board, i1, i1 + size))
+    top = cube[0]
+    bottom = cube[1]
+    left = cube[2]
+    right = cube[3]
+    front = cube[4]
+    back = cube[5]
 
-    if i1 % size != 0:
-        result.append(swap(board, i1, i1 - 1))
-    
-    if (i1 + 1) % size != 0:
-        result.append(swap(board, i1, i1 + 1))
+    if i1 - size >= 0: #move up
+        new_cube = (front, back, left, right, bottom, top)
+        result.append(swap(board, i1 - size, new_cube))
+    if i1 + size < len(board): #move down
+        new_cube = (back, front, left, right, top, bottom)
+        result.append(swap(board, i1 + size, new_cube))
+    if i1 % size != 0: #move left
+        new_cube = (right, left, top, bottom, front, back)
+        result.append(swap(board, i1 - 1, new_cube))
+    if (i1 + 1) % size != 0: #move right
+        new_cube = (left, right, bottom, top, front, back)
+        result.append(swap(board, i1 + 1, new_cube))
 
     return result
-
-def is_solvable(size, state):
-    #size, board = state.split()
-    board = state
-    #size = 4
-    out_of_order = 0
-
-    blank = board.index(".")
-    board = board[:blank] + board[blank + 1:]
-
-    for index in range(len(board)):
-        for i in board[index:]:
-            if ord(board[index]) > ord(i):
-                out_of_order += 1
-    
-    blank = blank//int(size)
-    #print("# of out of order pairs:", out_of_order,"/ Blank row:", blank)
-    if int(size)%2 != 0:
-        if out_of_order%2 != 0:
-            return False
-        return True
-    else:
-        if (out_of_order%2 != 0 and blank%2 == 0) or (out_of_order%2 == 0 and blank%2 != 0):
-            return True
-        return False
 
 def heuristic(size, state):
     #size, board = state.split()
@@ -102,8 +105,6 @@ def heuristic(size, state):
     return total
 
 def a_star(size, state):
-    if is_solvable(size, state) == False:
-        return "no solution"
     goal = find_goal(state)
     closed = set()
     start = (heuristic(size, state), 0, state)
@@ -134,4 +135,3 @@ for x in line_list:
     print("Line %s" % count + ":", board, "A* -", v, "in", end - start)
     #print("\n")
     count += 1
-
