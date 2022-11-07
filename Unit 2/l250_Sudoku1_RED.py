@@ -8,7 +8,7 @@ from time import perf_counter
 
 total_start = perf_counter()
 file = sys.argv[1]
-#file = "puzzles_1_standard_easy.txt"
+# file = "puzzles_1_standard_easy.txt"
 sudoku_list = []
 global_symbols = "123456789ABCDEFGHIJKLMNOPQRSTUV"
 global_symbol_list = ""
@@ -35,9 +35,7 @@ def set_up(line): #find n, subblock height/width, symbol list
                 s_height = n // check
         check -= 1
 
-    temp = sorted(line)
-    large_char_index = global_symbols.index(temp[len(temp) - 1])
-    symbol_list = global_symbols[:large_char_index + 1]
+    symbol_list = global_symbols[:n]
     global global_symbol_list
     global_symbol_list = symbol_list
 
@@ -126,14 +124,24 @@ def backtrack(line):
     var = line.index(".")
     for val in get_sorted_values(line, var):
         new_state = line[0:var] + str(val) + line[var+1:]
-        # print(new_state)
-        # n = set_up(new_state)
-        # print_puzzle(n[0], n[1], n[2], new_state)
-        # input()
+        print(new_state)
+        n = set_up(new_state)
+        print_puzzle(n[0], n[1], n[2], new_state)
+        input()
         result = backtrack(new_state)
         if result is not None:
             return result
     return None
+
+# puzzle = ".2.1........1.3."
+# s = set_up(puzzle)
+# print_puzzle(s[0], s[1], s[2], puzzle)
+# make_neighbors(s[0], s[1], s[2], puzzle)
+    
+# result = backtrack(puzzle)
+# print(result)
+# r = set_up(result)
+# print_puzzle(r[0], r[1], r[2], result)
 
 count = 0
 for i in sudoku_list:       
@@ -147,11 +155,8 @@ for i in sudoku_list:
     r = set_up(result)
     # print_puzzle(r[0], r[1], r[2], result)
     # print(crude_check(result))
-
     count += 1
 
 # print(global_subblock)
 # print("\n")
 # print(global_neighbors)
-
-
