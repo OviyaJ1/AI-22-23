@@ -6,9 +6,13 @@ import sys
 from collections import deque
 from time import perf_counter
 final_boards = []
-draws = set()
-x_wins = set()
-o_wins = set()
+
+def print_game(board):
+    print(board[0] + " | " + board[1] + " | " + board[2])
+    print("---------")
+    print(board[3] + " | " + board[4] + " | " + board[5])
+    print("---------")
+    print(board[6] + " | " + board[7] + " | " + board[8])    
 
 def game_over(board):
     for r in range(3):
@@ -42,63 +46,127 @@ def get_children(board, current_player):
             children.add(new_child)
     return children
 
-def min_step(board):
+def get_player_moves(board, current_player):
+    children = list()
+    for i in range(len(board)):
+        if board[i] == ".":
+            new_child = board[0:i] + current_player + board[i+1:]
+            children.append(new_child)
+    count = 0
+    for c in children:
+        print("Move:", count)
+        print_game(c)
+        print("\n")
+        count += 1
+    return children
+
+def min_step(board, initial_board):
     if (v := game_over(board)) != None:
-        global final_boards, draws, x_wins, o_wins
         final_boards.append(board)
-        if v == 0:
-            draws.add(board)
-        if v == 1:
-            x_wins.add(board)
-        if v == -1:
-            o_wins.add(board)
-        return v
+        return v, board, initial_board
     results = []
     for next_board in get_children(board, "O"):
-        results.append(max_step(next_board))
-    return max(results)
+        results.append(max_step(next_board, initial_board))
+    return min(results)
 
-def max_step(board):
+def max_step(board, initial_board):
     if (v := game_over(board)) != None:
-        global final_boards, draws, x_wins, o_wins
         final_boards.append(board)
-        if v == 0:
-            draws.add(board)
-        if v == 1:
-            x_wins.add(board)
-        if v == -1:
-            o_wins.add(board)
-        return v
+        return v, board, initial_board
     results = []
     for next_board in get_children(board, "X"):
-        results.append(min_step(next_board))
+        results.append(min_step(next_board, initial_board))
     return max(results)
 
-max_step(".........")
-print(len(final_boards))
-print(len(set(final_boards)))
-print(len(draws))
+def max_move(board):
+    results = []
+    for next_board in get_children(board, "X"):
+        results.append(min_step(next_board, next_board))
+    return (max(results))[2]
 
-five = []
-seven = []
-nine = []
-six = []
-eight = []
-for i in x_wins:
-    if (c := i.count("X")) == 5:
-        nine.append(i)
-    elif (c := i.count("X")) == 4:
-        seven.append(i)
-    elif (c := i.count("X")) == 3:
-        five.append(i)
+def min_move(board):
+    results = []
+    for next_board in get_children(board, "O"):
+        results.append(max_step(next_board, next_board))
+    return (min(results))[2]
 
-for i in o_wins:
-    if (c := i.count("O")) == 4:
-        eight.append(i)
-    elif (c := i.count("O")) == 3:
-        six.append(i) 
+official_board = "........."
+print("Starting board:")
+print_game(official_board)
+#official_board = sys.argv[1]
+if official_board == ".........":
+    print("Wanna go first? (Say 'yes' or 'no')")
+    answer = input()
 
+    if answer == "yes":
+        human_move = True
+        while game_over(official_board) == None:
+            if human_move:
+                print("Your turn: (Choose from 0 - 8)")
+                children = get_player_moves(official_board, "X")
+                choice = input()
+                official_board = children[int(choice)]
+                print_game(official_board)
+                human_move = False
+            else:
+                official_board = min_move(official_board)
+                print_game(official_board)
+                human_move = True
+    elif answer == 'no':
+        human_move = False
+        while game_over(official_board) == None:
+            if human_move:
+                print("Your turn: (Choose from 0 - 8)")
+                children = get_player_moves(official_board, "O")
+                choice = input()
+                official_board = children[int(choice)]
+                print_game(official_board)
+                human_move = False
+            else:
+                official_board = max_move(official_board)
+                print_game(official_board)
+                human_move = True
+    else:
+        print("bruh moment")
+else:
+    if official_board.count("O") == official_board.count("X"):
+        human_move = False
+        while game_over(official_board) == None:
+            if human_move:
+                print("Your turn: (Choose from 0 - 8)")
+                children = get_player_moves(official_board, "O")
+                choice = input()
+                official_board = children[int(choice)]
+                print_game(official_board)
+                human_move = False
+            else:
+                official_board = max_move(official_board)
+                print_game(official_board)
+                human_move = True
+    else:
+        human_move = False
+        while game_over(official_board) == None:
+            if human_move:
+                print("Your turn: (Choose from 0 - 8)")
+                children = get_player_moves(official_board, "X")
+                choice = input()
+                official_board = children[int(choice)]
+                print_game(official_board)
+                human_move = False
+            else:
+                official_board = min_move(official_board)
+                print_game(official_board)
+                human_move = True
+    
+# while game_over(official_board) == None:
+#     official_board = max_move(official_board)
+#     print_game(official_board)
+#     official_board = input()
+#     print_game(official_board)
+
+#print(max_move("XOX......"))
+#print_game("........O")
 #print(x_wins)
-print(len(x_wins), len(o_wins), len(five), len(seven), len(nine), len(six), len(eight))
+#print(len(x_wins), len(o_wins), len(five), len(seven), len(nine), len(six), len(eight))
 
     
