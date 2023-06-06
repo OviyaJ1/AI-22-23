@@ -15,10 +15,16 @@ num7 = "01\n8\n7\n\n0\n0 1\n1 2\n\n1\n0 1\n1 2\n\n2\n0 3\n1 2\n\n3\n0 4\n1 5\n\n
 #input = "dfa_ex_spec.txt"
 #input2 = "dfa_ex_tests.txt"
 input2 = sys.argv[2]
+spec = ""
 
 #f = open(input)
 #spec = f.read()
-spec = ""
+
+try:
+    spec2 = int(sys.argv[1])
+except:
+    f = open(sys.argv[1])
+    spec = f.read()
 
 if sys.argv[1] == "1":
     spec = num1
@@ -34,8 +40,6 @@ elif sys.argv[1] == "6":
     spec = num6
 elif sys.argv[1] == "7":
     spec = num7
-else:
-    print("oops")
 
 split = spec.split("\n\n")
 
